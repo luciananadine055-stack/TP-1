@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listado de Productos - Telas y Bordados</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f3f0 0%, #e8e2db 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .controls {
+            padding: 20px 30px;
+            background: #faf8f6;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .search-box, .filter-select {
+            padding: 10px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .search-box:focus, .filter-select:focus {
+            outline: none;
+            border-color: #D2691E;
+            box-shadow: 0 0 0 3px rgba(210, 105, 30, 0.1);
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .filter-select {
+            min-width: 150px;
+        }
+
+        .add-btn {
+            background: linear-gradient(135deg, #228B22 0%, #32CD32 100%);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.2s ease;
+        }
+
+        .add-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(34, 139, 34, 0.3);
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        th {
+            background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%);
+            color: white;
+            padding: 15px 12px;
+            text-align: left;
+            font-weight: bold;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #f0f0f0;
+            vertical-align: middle;
+        }
+
+        tr:hover {
+            background-color: #fef9f6;
+        }
+
+        .product-img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 2px solid #ddd;
+        }
+
+        .product-name {
+            font-weight: bold;
+            color: #8B4513;
+            margin-bottom: 5px;
+        }
+
+        .product-description {
+            color: #666;
+            font-size: 12px;
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .price {
+            font-weight: bold;
+            color: #D2691E;
+            font-size: 16px;
+        }
+
+        .stock {
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .stock.low {
+            color: #dc3545;
+        }
+
+        .stock.medium {
+            color: #ffc107;
+        }
+
+        .stock.high {
+            color: #28a745;
+        }
+
+        .category-tag {
+            background: #8B4513;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+            transition: all 0.2s ease;
+        }
+
+        .btn-edit {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-style: italic;
+        }
+
+        @media (max-width: 768px) {
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .search-box, .filter-select {
+                width: 100%;
+            }
+            
+            table {
+                font-size: 12px;
+            }
+            
+            th, td {
+                padding: 8px 6px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧵 Telas y Bordados</h1>
+            <p>Gestión de Productos Artesanales</p>
+        </div>
+        
+        <div class="controls">
+            <input type="text" class="search-box" placeholder="🔍 Buscar productos..." id="searchBox">
+            <select class="filter-select" id="categoryFilter">
+                <option value="">Todas las categorías</option>
+                <option value="Carteras">Carteras</option>
+                <option value="Bolsos">Bolsos</option>
+                <option value="Bordados">Bordados</option>
+                <option value="Accesorios">Accesorios</option>
+            </select>
+            <button class="add-btn" onclick="addProduct()">+ Agregar Producto</button>
+        </div>
+
+        <div class="table-container">
+            <table id="productsTable">
+                <thead>
+                    <tr>
+                        <th>Imagen</th>
+                        <th>Producto</th>
+                        <th>Categoría</th>
+                        <th>Precio</th>
+                        <th>Stock</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <!-- Los productos se cargarán aquí -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Datos de productos de ejemplo
+        let products = [
+            {
+                id: 1,
+                name: "Cartera de Cuero Artesanal",
+                description: "Cartera hecha a mano con cuero genuino y bordados únicos",
+                category: "Carteras",
+                price: 15500,
+                stock: 8,
+                image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Crect width='60' height='60' fill='%238B4513'/%3E%3Ctext x='30' y='35' font-family='Arial' font-size='24' fill='white' text-anchor='middle'%3E👜%3C/text%3E%3C/svg%3E"
+            },
+            {
+                id: 2,
+                name: "Bolso Bordado Floral",
+                description: "Hermoso bolso con bordados florales tradicionales",
+                category: "Bolsos",
+                price: 12800,
+                stock: 15,
+                image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Crect width='60' height='60' fill='%23D2691E'/%3E%3Ctext x='30' y='35' font-family='Arial' font-size='24' fill='white' text-anchor='middle'%3E👝%3C/text%3E%3C/svg%3E"
+            },
+            {
+                id: 3,
+                name: "Bordado Decorativo Mariposas",
+                description: "Bordado exclusivo con diseño de mariposas para decoración",
+                category: "Bordados",
+                price: 8900,
+                stock: 3,
+                image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Crect width='60' height='60' fill='%23228B22'/%3E%3Ctext x='30' y='35' font-family='Arial' font-size='24' fill='white' text-anchor='middle'%3E🦋%3C/text%3E%3C/svg%3E"
+            },
+            {
+                id: 4,
+                name: "Cartera Bandolera Vintage",
+                description: "Cartera estilo vintage con detalles en bordado a mano",
+                category: "Carteras",
+                price: 18200,
+                stock: 12,
+                image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Crect width='60' height='60' fill='%238B4513'/%3E%3Ctext x='30' y='35' font-family='Arial' font-size='20' fill='white' text-anchor='middle'%3E🎒%3C/text%3E%3C/svg%3E"
+            },
+            {
+                id: 5,
+                name: "Monedero con Bordado Geométrico",
+                description: "Pequeño monedero con patrones geométricos bordados",
+                category: "Accesorios",
+                price: 6500,
+                stock: 25,
+                image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Crect width='60' height='60' fill='%23DC143C'/%3E%3Ctext x='30' y='35' font-family='Arial' font-size='24' fill='white' text-anchor='middle'%3E💰%3C/text%3E%3C/svg%3E"
+            },
+            {
+                id: 6,
+                name: "Bolso Tote Personalizable",
+                description: "Bolso tote grande con opción de bordado personalizado",
+                category: "Bolsos",
+                price: 14750,
+                stock: 7,
+                image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Crect width='60' height='60' fill='%23D2691E'/%3E%3Ctext x='30' y='35' font-family='Arial' font-size='24' fill='white' text-anchor='middle'%3E🛍️%3C/text%3E%3C/svg%3E"
+            }
+        ];
+
+        let filteredProducts = [...products];
+
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            
+            if (filteredProducts.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="no-results">No se encontraron productos que coincidan con los criterios de búsqueda</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = filteredProducts.map(product => `
+                <tr>
+                    <td><img src="${product.image}" alt="${product.name}" class="product-img"></td>
+                    <td>
+                        <div class="product-name">${product.name}</div>
+                        <div class="product-description">${product.description}</div>
+                    </td>
+                    <td><span class="category-tag">${product.category}</span></td>
+                    <td class="price">$${product.price.toLocaleString('es-AR')}</td>
+                    <td class="stock ${getStockClass(product.stock)}">${product.stock}</td>
+                    <td>${getStatusBadge(product.stock)}</td>
+                    <td class="actions">
+                        <button class="btn btn-edit" onclick="editProduct(${product.id})">✏️ Editar</button>
+                        <button class="btn btn-delete" onclick="deleteProduct(${product.id})">🗑️ Eliminar</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function getStockClass(stock) {
+            if (stock <= 5) return 'low';
+            if (stock <= 10) return 'medium';
+            return 'high';
+        }
+
+        function getStatusBadge(stock) {
+            if (stock <= 5) return '<span style="color: #dc3545; font-weight: bold;">Stock Bajo ⚠️</span>';
+            if (stock <= 10) return '<span style="color: #ffc107; font-weight: bold;">Stock Medio ⚡</span>';
+            return '<span style="color: #28a745; font-weight: bold;">Disponible ✅</span>';
+        }
+
+        function filterProducts() {
+            const searchTerm = document.getElementById('searchBox').value.toLowerCase();
+            const categoryFilter = document.getElementById('categoryFilter').value;
+
+            filteredProducts = products.filter(product => {
+                const matchesSearch = product.name.toLowerCase().includes(searchTerm) || 
+                                    product.description.toLowerCase().includes(searchTerm);
+                const matchesCategory = !categoryFilter || product.category === categoryFilter;
+                
+                return matchesSearch && matchesCategory;
+            });
+
+            renderTable();
+        }
+
+        function editProduct(id) {
+            const product = products.find(p => p.id === id);
+            if (product) {
+                alert(`Editando: ${product.name}\n(Esta funcionalidad se implementaría con un formulario)`);
+            }
+        }
+
+        function deleteProduct(id) {
+            const product = products.find(p => p.id === id);
+            if (product && confirm(`¿Estás seguro de eliminar "${product.name}"?`)) {
+                products = products.filter(p => p.id !== id);
+                filterProducts();
+            }
+        }
+
+        function addProduct() {
+            alert('Se abriría el formulario para agregar un nuevo producto\n(Esta funcionalidad se implementaría con un modal o nueva página)');
+        }
+
+        // Event listeners
+        document.getElementById('searchBox').addEventListener('input', filterProducts);
+        document.getElementById('categoryFilter').addEventListener('change', filterProducts);
+
+        // Cargar tabla inicial
+        renderTable();
+    </script>
+</body>
+</html>
